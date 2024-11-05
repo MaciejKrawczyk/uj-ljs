@@ -1,0 +1,82 @@
+[
+    {
+        "name": "Bruschetta",
+        "price": 8.00
+    },
+    {
+        "name": "Chicken Wings",
+        "price": 12.00
+    },
+    {
+        "name": "Stuffed Mushrooms",
+        "price": 10.00
+    },
+    {
+        "name": "Spinach Artichoke Dip",
+        "price": 9.00
+    },
+    {
+        "name": "Caesar Salad",
+        "price": 10.00
+    },
+    {
+        "name": "Greek Salad",
+        "price": 11.00
+    },
+    {
+        "name": "Cobb Salad",
+        "price": 12.00
+    },
+    {
+        "name": "Grilled Salmon",
+        "price": 22.00
+    },
+    {
+        "name": "Ribeye Steak",
+        "price": 28.00
+    },
+    {
+        "name": "Pasta Primavera",
+        "price": 16.00
+    },
+    {
+        "name": "Chicken Alfredo",
+        "price": 18.00
+    },
+    {
+        "name": "Margherita Pizza",
+        "price": 14.00
+    },
+    {
+        "name": "Fish Tacos",
+        "price": 15.00
+    },
+    {
+        "name": "Vegetarian Stir-Fry",
+        "price": 14.00
+    },
+    {
+        "name": "Cheesecake",
+        "price": 7.00
+    },
+    {
+        "name": "Chocolate Lava Cake",
+        "price": 8.00
+    },
+    {
+        "name": "Tiramisu",
+        "price": 6.00
+    },
+    {
+        "name": "Fresh Lemonade",
+        "price": 4.00
+    },
+    {
+        "name": "Iced Tea",
+        "price": 3.00
+    },
+    {
+        "name": "Craft Beer",
+        "price": 6.00
+    }
+]
