@@ -5,6 +5,7 @@ require 'sqlite3'
 require 'zlib'
 require 'stringio'
 require 'sequel'
+require 'json'
 
 # Setup SQLite3 database using Sequel
 def setup_database
@@ -17,14 +18,15 @@ def setup_database
       String :title
       String :price
       String :link
+      Json :details
     end
   end
 
   db
 end
 
-def insert_product(db, title, price, link)
-  db[:products].insert(title: title, price: price, link: link)
+def insert_product(db, title, price, link, json)
+  db[:products].insert(title: title, price: price, link: link, details: json)
 end
 
 def setup_request_headers
@@ -53,67 +55,88 @@ def setup_request_headers
   }
 end
 
-def fetch_html(url, db)
+def fetch_html_content(url)
   uri = URI.parse(url)
   http = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl = (uri.scheme == "https")
-
   request = Net::HTTP::Get.new(uri.request_uri)
-
-  # Use the setup_request_headers function to add headers
   setup_request_headers.each do |key, value|
     request[key] = value
   end
-
   response = http.request(request)
-
   case response['content-encoding']
   when 'gzip'
-    body = Zlib::GzipReader.new(StringIO.new(response.body)).read
+    Zlib::GzipReader.new(StringIO.new(response.body)).read
   else
-    body = response.body
+    response.body
   end
+end
 
-  if response.is_a?(Net::HTTPSuccess)
-    parse_html(body, db)
+def fetch_html(url, db)
+  html_content = fetch_html_content(url)
+
+  if html_content
+    parse_html(html_content, db)
   else
-    puts "Failed to retrieve the HTML content. Response code: #{response.code}"
+    puts "Failed to retrieve the HTML content."
+  end
+end
+
+
+def fetch_and_return_product_details(link)
+  full_url = "#{link}"
+  product_html = fetch_html_content(full_url)
+
+  if product_html
+    doc = Nokogiri::HTML(product_html)
+    table = doc.at_css('table')
+
+    if table
+      product_details = {}
+
+      rows = table.css('tr')
+      rows.each do |row|
+        tds = row.css('td')
+
+        if tds.size == 2
+          key = tds[0].text.strip
+          value = tds[1].text.strip
+          product_details[key] = value
+        else
+          puts "Row does not have exactly 2 columns."
+        end
+      end
+
+      return JSON.generate(product_details)
+    else
+      puts "No table found for this product."
+      return nil
+    end
+  else
+    puts "Failed to retrieve the product detail page."
+    nil
   end
 end
 
 def parse_html(html, db)
-  # Parse the HTML document
   doc = Nokogiri::HTML(html)
-
-  # Find <article> elements
   items = doc.css('article')
-
-  # Extract and print the important data
   items.each do |item|
-    # Check for the title
     title_element = item.at_css('.mgn2_14')
     title = title_element ? title_element.text.strip : nil
-
-    # Check for the price
     price_element = item.at_css('.mli8_k4.mgmw_qw')
     price = price_element ? price_element.text.strip : nil
-
-    # Check for the link to the detailed item page
-    link_element = item.at_css('a') # Find the first <a> tag
+    link_element = item.at_css('a')
     link = link_element ? link_element['href'] : nil
-
-    # Skip to the next item if title, price, or link is nil
     next if title.nil? || price.nil? || link.nil?
-
-    # Check if the link contains "oferta"
     next unless link.include?("/oferta/")
+    details = fetch_and_return_product_details(link)
 
-    # Insert the product into the database
-    insert_product(db, title, price, link)
-
-    # Print the title and price if both are present
+    insert_product(db, title, price, link, details)
     puts "Title: #{title}" unless title.empty?
     puts "Price: #{price}" unless price.empty?
+    puts "Details: #{details}" unless details.empty?
+
   end
 end
 
