@@ -108,7 +108,7 @@ export default function App() {
                 <Card className={'w-full my-5'}>
                     <CardHeader>
                         <CardTitle>Produkty</CardTitle>
-                        <CardDescription>Przewijaj aby przeglądać produkty</CardDescription>
+                        <CardDescription>Przewijaj, aby przeglądać produkty</CardDescription>
                     </CardHeader>
                     <CardContent className={'w-full flex justify-center my-3'}>
                         <Carousel className="w-full">
@@ -150,7 +150,7 @@ export default function App() {
                 <footer>
                     <Card>
                         <CardContent className={'flex justify-center items-center p-4'}>
-                            <p className={'text-gray-400'}>Copyright © 2023 M.K. Shop</p>
+                            <p className={'text-gray-400'}>Copyright© Maciej Krawczyk</p>
                         </CardContent>
                     </Card>
                 </footer>
