@@ -1,82 +1,142 @@
 [
     {
+        "id": 1,
         "name": "Bruschetta",
-        "price": 8.00
+        "price": 8.00,
+        "preparation_time": 10,
+        "category": "Appetizer"
     },
     {
+        "id": 2,
         "name": "Chicken Wings",
-        "price": 12.00
+        "price": 12.00,
+        "preparation_time": 15,
+        "category": "Appetizer"
     },
     {
+        "id": 3,
         "name": "Stuffed Mushrooms",
-        "price": 10.00
+        "price": 10.00,
+        "preparation_time": 12,
+        "category": "Appetizer"
     },
     {
+        "id": 4,
         "name": "Spinach Artichoke Dip",
-        "price": 9.00
+        "price": 9.00,
+        "preparation_time": 12,
+        "category": "Appetizer"
     },
     {
+        "id": 5,
         "name": "Caesar Salad",
-        "price": 10.00
+        "price": 10.00,
+        "preparation_time": 8,
+        "category": "Salad"
     },
     {
+        "id": 6,
         "name": "Greek Salad",
-        "price": 11.00
+        "price": 11.00,
+        "preparation_time": 8,
+        "category": "Salad"
     },
     {
+        "id": 7,
         "name": "Cobb Salad",
-        "price": 12.00
+        "price": 12.00,
+        "preparation_time": 10,
+        "category": "Salad"
     },
     {
+        "id": 8,
         "name": "Grilled Salmon",
-        "price": 22.00
+        "price": 22.00,
+        "preparation_time": 20,
+        "category": "Main Course"
     },
     {
+        "id": 9,
         "name": "Ribeye Steak",
-        "price": 28.00
+        "price": 28.00,
+        "preparation_time": 25,
+        "category": "Main Course"
     },
     {
+        "id": 10,
         "name": "Pasta Primavera",
-        "price": 16.00
+        "price": 16.00,
+        "preparation_time": 15,
+        "category": "Main Course"
     },
     {
+        "id": 11,
         "name": "Chicken Alfredo",
-        "price": 18.00
+        "price": 18.00,
+        "preparation_time": 18,
+        "category": "Main Course"
     },
     {
+        "id": 12,
         "name": "Margherita Pizza",
-        "price": 14.00
+        "price": 14.00,
+        "preparation_time": 20,
+        "category": "Main Course"
     },
     {
+        "id": 13,
         "name": "Fish Tacos",
-        "price": 15.00
+        "price": 15.00,
+        "preparation_time": 12,
+        "category": "Main Course"
     },
     {
+        "id": 14,
         "name": "Vegetarian Stir-Fry",
-        "price": 14.00
+        "price": 14.00,
+        "preparation_time": 15,
+        "category": "Main Course"
     },
     {
+        "id": 15,
         "name": "Cheesecake",
-        "price": 7.00
+        "price": 7.00,
+        "preparation_time": 5,
+        "category": "Dessert"
     },
     {
+        "id": 16,
         "name": "Chocolate Lava Cake",
-        "price": 8.00
+        "price": 8.00,
+        "preparation_time": 10,
+        "category": "Dessert"
     },
     {
+        "id": 17,
         "name": "Tiramisu",
-        "price": 6.00
+        "price": 6.00,
+        "preparation_time": 8,
+        "category": "Dessert"
     },
     {
+        "id": 18,
         "name": "Fresh Lemonade",
-        "price": 4.00
+        "price": 4.00,
+        "preparation_time": 3,
+        "category": "Beverage"
     },
     {
+        "id": 19,
         "name": "Iced Tea",
-        "price": 3.00
+        "price": 3.00,
+        "preparation_time": 3,
+        "category": "Beverage"
     },
     {
+        "id": 20,
         "name": "Craft Beer",
-        "price": 6.00
+        "price": 6.00,
+        "preparation_time": 2,
+        "category": "Beverage"
     }
 ]
