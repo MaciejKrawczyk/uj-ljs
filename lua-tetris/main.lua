@@ -193,6 +193,37 @@ function love.update(dt)
     end
 end
 
+function love.touchpressed(id, x, y, dx, dy, pressure)
+    -- Define the size of the touch zones (you may adjust these based on your layout)
+    local touch_zone_size = 100
+
+    -- Left side touch zone (move left)
+    if x < touch_zone_size and y < window_height then
+        if can_place_piece(piece_x - 1, piece_y, current_piece) then
+            piece_x = piece_x - 1
+        end
+    -- Right side touch zone (move right)
+    elseif x > window_width - touch_zone_size and y < window_height then
+        if can_place_piece(piece_x + 1, piece_y, current_piece) then
+            piece_x = piece_x + 1
+        end
+    -- Bottom-left corner (move down)
+    elseif x < touch_zone_size and y > window_height - touch_zone_size then
+        if can_place_piece(piece_x, piece_y + 1, current_piece) then
+            piece_y = piece_y + 1
+        end
+    -- Bottom-right corner (rotate piece)
+    elseif x > window_width - touch_zone_size and y > window_height - touch_zone_size then
+        rotate_piece()
+    -- "Save" button area (middle-left bottom section)
+    elseif x < window_width / 2 and y > window_height - touch_zone_size * 2 then
+        save_game()
+    -- "Load" button area (middle-right bottom section)
+    elseif x > window_width / 2 and y > window_height - touch_zone_size * 2 then
+        load_game()
+    end
+end
+
 function love.keypressed(key)
     if key == "left" and can_place_piece(piece_x - 1, piece_y, current_piece) then
         piece_x = piece_x - 1
