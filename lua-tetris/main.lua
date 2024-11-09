@@ -28,6 +28,40 @@ local clearing_rows = {}
 local clearing_timer = 0
 local clearing_duration = 0.3
 
+-- Save the game state to a file
+function save_game()
+    local game_state = {
+        grid = grid,
+        piece_x = piece_x,
+        piece_y = piece_y,
+        current_piece = current_piece,
+        next_piece = next_piece,
+        current_color = current_color,
+    }
+    local encoded = json.encode(game_state)
+    love.filesystem.write("tetris_save.json", encoded)
+    print("Game saved!")
+end
+
+-- Load the game state from a file
+function load_game()
+    if love.filesystem.getInfo("tetris_save.json") then
+        local contents, size = love.filesystem.read("tetris_save.json")
+        local game_state = json.decode(contents)
+        
+        -- Restore game state
+        grid = game_state.grid
+        piece_x = game_state.piece_x
+        piece_y = game_state.piece_y
+        current_piece = game_state.current_piece
+        next_piece = game_state.next_piece
+        current_color = game_state.current_color
+        print("Game loaded!")
+    else
+        print("No save file found.")
+    end
+end
+
 function love.load()
     love.window.setMode(window_width, window_height)
     reset_grid()
@@ -173,6 +207,10 @@ function love.keypressed(key)
             piece_y = piece_y + 1
         end
         lock_piece()
+    elseif key == "s" then
+        save_game()
+    elseif key == "l" then
+        load_game()
     end
 end
 
