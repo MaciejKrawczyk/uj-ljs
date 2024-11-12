@@ -2,4 +2,4 @@ pvc
 1
 o
 5
-o o 2 x 4 x 6 7 8
+o 1 o x 4 5 x 7 8
