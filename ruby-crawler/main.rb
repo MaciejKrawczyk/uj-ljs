@@ -35,7 +35,7 @@ def setup_request_headers
     'Accept-Encoding' => 'gzip, deflate, br, zstd',
     'Accept-Language' => 'pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7',
     'Cache-Control' => 'no-cache',
-    'Cookie' => '_cmuid=752bb959-360f-4f77-bbdc-a6bc5b9d17ab; gdpr_permission_given=1; __gfp_64b=-TURNEDOFF; OptOutOnRequest=groups=googleAnalytics:1,googleAdvertisingProducts:1,tikTok:1,allegroAdsNetwork:1,facebook:1; _fbp=fb.1.1723994617476.1546036329; _meta_facebookTag_sync=1723994617476; QXLSESSID=5f108ef5dc0562df2b28577a19d78ada64a1efab155a17//01; wdctx=v5.lVWbQYQ0JG2xwARgNzVl0Loz-C4Be8ndtNpFJKErujTrUuvT0iD2Zn0NV0xQWhMOGVwX5bwCkF9tL1H_6XqJXlDfSfj4Xb7CyP2bYib6jT4_bnMvdkFQBwEtBZhl__sR374uRlf3APu6YY0NnGdqME8fzLmaHvAsd3Y_mQ3jnx0GXMWHeEXM2pYEOPamsaOzsdhin3hsIRsDRncMEUrGlAyrmHHdulaI4hWiRSThmMW1.yILOSauzQFWAuHbsmW0rXg.02Y8czyztUo; _meta_googleGtag_session_id=1730738823; parcelsChecksum=9124616b2a171ea71abf78155a26b94de2d7d68887b83b30a0d3c93e0ad529cf; _meta_googleGtag_ga_session_count=1; _meta_googleGtag_ga=GA1.2.1829968911.1730738823; _meta_googleGtag_ga_library_loaded=1730739201387; datadome=BdQ1w5z_SzhvNZ~w5X13xheAkayMoS0MSfxfXC0p0HymiU0KYM8AEjrZoU5UWFMjbkMxmOqS_0EjGsHdEYvgF77elrkBXNvVcX25CEDHmIuoMLB9FqmCv1RtNVrSuYBZ',
+    'Cookie' => '_cmuid=eea113d4-7fac-4514-a715-57610daabad9; wdctx=v5.M5jQ0j7yW8Ej5ZsfTib3XtonZH3BVtRTN2kBUyoG-T1RiQ_QJ9ZP9DI8wqSE4H202dFQnpzNKWJh9DM57WW_kM9DTme3xBdeaGLI6X_T6mDD1wlDqNqGcUMPSqaA68exKGesMxm8oHIG9Xr1at8NcKwYdLgeoGYf_ojTMd3cDxnJozJcRSwyGehMrJOVZKR0OE2l770XfxsC9I0L9p73ARuuWqqHql7cWYpnoAPQm-29.RJ1bPrgXQrCqYSuvRsjd8Q.HsFwJK4AYFI; OptOutOnRequest=groups=googleAnalytics:0,googleAdvertisingProducts:0,tikTok:0,allegroAdsNetwork:0,facebook:0; _gcl_au=1.1.2014488935.1731429839; gdpr_permission_given=1; _ga=GA1.1.1552461072.1731429839; _ga_G64531DSC4=GS1.1.1731429838.1.0.1731429838.60.0.0; __gfp_64b=E36A_vWcdCzs2oN0Wjnq7zm9OZCKakxa5FHHeafRPW..E7|1731429832|2; datadome=RxxMkuM6tBsmQmBX3EzvTA_ko2A9N6lKAk25xG4EBBqOwGte3y8XlipbnJvcsoCouB1Gm6HsVQmlAn0mReRUSNXzXQz8P0zSpEgjadZKqf~MnjDva_tzGKBdhHb0VHwX',
     'DPR' => '1',
     'Pragma' => 'no-cache',
     'Sec-CH-UA' => '"Chromium";v="130", "Google Chrome";v="130", "Not?A_Brand";v="99"',
@@ -81,7 +81,6 @@ def fetch_html(url, db)
     puts "Failed to retrieve the HTML content."
   end
 end
-
 
 def fetch_and_return_product_details(link)
   full_url = "#{link}"
@@ -130,13 +129,15 @@ def parse_html(html, db)
     link = link_element ? link_element['href'] : nil
     next if title.nil? || price.nil? || link.nil?
     next unless link.include?("/oferta/")
+
     details = fetch_and_return_product_details(link)
 
     insert_product(db, title, price, link, details)
-    puts "Title: #{title}" unless title.empty?
-    puts "Price: #{price}" unless price.empty?
-    puts "Details: #{details}" unless details.empty?
+    puts "Title: #{title}" unless title.to_s.empty?
+    puts "Price: #{price}" unless price.to_s.empty?
+    puts "Details: #{details}" unless details.to_s.empty?
 
+    sleep 1
   end
 end
 
