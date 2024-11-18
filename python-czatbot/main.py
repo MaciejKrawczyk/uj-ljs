@@ -70,11 +70,11 @@ class NormalConversationChat:
         self.system_prompt = system_prompt
 
 
-def determine_function_to_call(user_input: str):
+def get_chatbot(user_prompt: str):
     pass
 
 
-def get_chatbot(user_prompt: str):
+def determine_function_to_call(user_input: str):
     pass
 
 
