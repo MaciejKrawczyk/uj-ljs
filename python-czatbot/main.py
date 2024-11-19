@@ -1,16 +1,18 @@
 import json
+from datetime import datetime
 from random import randint
 
 import ollama
 
-from functions import do_nothing, get_order_status, place_order, print_menu, get_opening_hours
+from consts import CHATBOT_SYSTEM_PROMPT
+from functions import do_nothing, get_order_status, place_order, print_menu, get_opening_hours, get_menu_str, \
+    get_opening_hours_str
 
 orders = []
 
 
 class Config:
-    def __init__(self, output_format="json", model="llama3.1"):
-        self.format = output_format
+    def __init__(self, model="llama3.1"):
         self.model = model
 
 
@@ -19,63 +21,87 @@ class Chat:
         self.system_prompt = system_prompt
         self.config = config
 
-    def get_json_response(self, user_prompt: str):
+    def get_json_response(self, conversation_history: list[dict]):
         response = ollama.chat(
             model=self.config.model,
             stream=False,
             messages=[
-                {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
-            format=self.config.format,
+                         {"role": "system", "content": self.system_prompt},
+                     ] + conversation_history,
+            format="json"
         )
+        print(f"***TEST: {response['message']}***")
         json_output = json.loads(response['message']['content'])
         return json_output
 
-    def get_response(self, user_prompt: str):
+    def get_response(self, conversation_history: list[dict]) -> dict:
+        print(f"TEST***{conversation_history}")
         response = ollama.chat(
             model=self.config.model,
             stream=False,
             messages=[
-                {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
+                         {"role": "system", "content": self.system_prompt},
+                     ] + conversation_history,
         )
-        output = json.loads(response['message']['content'])
-        return output
+        output = response['message']['content']
+        print(f"***TEST: {response['message']}***")
+        return {
+            "output": output,
+            "conversation_history": conversation_history + [{"role": "assistant", "content": output}]
+        }
+
+
+def get_today():
+    return datetime.now().strftime("%A")  # Returns the day of the week (e.g., Monday)
+
+
+def get_time():
+    return datetime.now().strftime("%H:%M")  # Returns time in hours and minutes (e.g., 14:30)
 
 
 class OpeningHourChat:
-    def __init__(self, system_prompt: str):
-        self.system_prompt = system_prompt
+    def __init__(self):
+        self.system_prompt = (
+            f"Jesteś pomocnym asystentem restauracji. Udzielasz informacji o godzinach otwarcia restauracji."
+            f"Godziny otwarcia restauracji w formacie json: {get_opening_hours_str()}"
+            f"Dzisiaj jest: {get_today()}. godzina: {get_time()}")
+        print(f"prompt: {self.system_prompt}")
+        self.chat = Chat(self.system_prompt, Config())
+
+    def answer(self, conversation_history: list[dict]):
+        return self.chat.get_response(conversation_history)
 
 
 class PlaceOrderChat:
-    def __init__(self, system_prompt: str):
-        self.system_prompt = system_prompt
+    def __init__(self):
+        self.system_prompt = f"Jesteś pomocnym asystentem restauracji. Pomagasz w zebraniu zamówienia z menu. Menu w formacie json: {get_menu_str()}. Jeśli jakaś rzecz nie znajduje się w menu, poinformuj o tym użytkownika i powiedz żeby spróbował coś innego. Jeśli użytkownik skończy składać zamówienie, poinformuj go o wszystkich zamówionych rzeczach"
+        self.chat = Chat(self.system_prompt, Config())
+
+    def answer(self, conversation_history: list[dict]):
+        return self.chat.get_response(conversation_history)
 
 
 class GetMenuChat:
-    def __init__(self, system_prompt: str):
-        self.system_prompt = system_prompt
+    def __init__(self):
+        self.system_prompt = f"Jesteś pomocnym asystentem restauracji. Udzielasz informacji o menu. Menu w formacie json: {get_menu_str()}"
+        self.chat = Chat(self.system_prompt, Config())
+
+    def answer(self, conversation_history: list[dict]):
+        return self.chat.get_response(conversation_history)
 
 
 class GetOrderStatusChat:
-    def __init__(self, system_prompt: str):
-        self.system_prompt = system_prompt
+    def __init__(self):
+        self.system_prompt = f""
+        self.chat = Chat(self.system_prompt, Config())
+
+    def answer(self, conversation_history: list[dict]):
+        return self.chat.get_response(conversation_history)
 
 
 class NormalConversationChat:
     def __init__(self, system_prompt: str):
-        self.system_prompt = system_prompt
-
-
-def get_chatbot(user_prompt: str):
-    pass
-
-
-def determine_function_to_call(user_input: str):
-    pass
+        self.system_prompt = f""
 
 
 class RestaurantChat:
@@ -108,42 +134,55 @@ class Order:
         self.menu = menu
 
 
-CHATBOT_SYSTEM_PROMPT = """
-Jesteś pomocnym asystentem restauracji. Udzielasz informacji o restauracji, pomagasz w składaniu zamówień oraz odpowiadasz na powiązane pytania.
+def get_scenario(user_prompt: str):
+    response = ollama.chat(
+        model="llama3.1",
+        stream=False,
+        messages=[
+            {"role": "system", "content": CHATBOT_SYSTEM_PROMPT},
+            {"role": "user", "content": user_prompt}
+        ],
+        format="json",
+    )
+    bot_output = json.loads(response['message']['content'])
+    function = bot_output['function']
+    return function
 
-Twoje odpowiedzi muszą mieć następujący format JSON: 
-{ "function": "<funkcja do wywołania>" }
 
-### Funkcje do wywołania:
-- **get_opening_hours**: Zwraca godziny otwarcia restauracji.
-- **get_menu**: Zwraca menu restauracji.
-- **place_order**: Rozpoczyna proces składania zamówienia w restauracji.
-- **get_order_status**: Zwraca status zamówienia. Może być konieczne poproszenie użytkownika o numer zamówienia lub inne szczegóły identyfikacyjne.
-- **do_nothing**: Używaj tej funkcji, gdy żadne z powyższych nie pasuje. W takim przypadku stwórz pomocną odpowiedź dla użytkownika w języku naturalnym PO POLSKU!.
+def opening_hours_scenario(conversation_history: list[dict]):
+    chat = OpeningHourChat()
+    print("*opening hours scenario*")
+    data = chat.answer(conversation_history)
+    print(data['output'])
+    return data['conversation_history']
 
-### Wytyczne:
-1. **Pytania uzupełniające**: 
-   - Jeśli zapytanie użytkownika jest niejasne lub niekompletne, zadawaj pytania uzupełniające, aby zebrać potrzebne informacje przed wywołaniem funkcji.
-   - Przykład: Jeśli użytkownik pyta „O której otwieracie?”, ale nie wskazuje dnia, zapytaj: „O który dzień tygodnia chodzi?”
 
-2. **Status zamówienia**: 
-   - Jeśli użytkownik pyta o status zamówienia, upewnij się, że posiadasz numer zamówienia lub inne wystarczające dane identyfikacyjne przed wykonaniem funkcji.
+def menu_scenario(conversation_history: list[dict]):
+    chat = GetMenuChat()
+    data = chat.answer(conversation_history)
+    print(data['output'])
+    print('*menu scenario*')
+    return data['conversation_history']
 
-3. **Obsługa zapytań nietypowych**:
-   - Używaj `do_nothing`, gdy pytanie użytkownika nie dotyczy bezpośrednio wymienionych funkcji. W takich przypadkach podaj uprzejmą i zrozumiałą odpowiedź w języku naturalnym.
 
-4. **Obsługa błędów**:
-   - Jeśli wykonanie funkcji nie jest możliwe (np. brak danych lub nieobsługiwane zapytanie), odpowiedz w sposób naturalny, wskazując użytkownikowi dalsze kroki.
+def order_scenario(conversation_history: list[dict]):
+    chat = PlaceOrderChat()
+    data = chat.answer(conversation_history)
+    print(data['output'])
+    return data['conversation_history']
 
-5. **Ton i język**:
-   - Zawsze utrzymuj uprzejmy, pomocny i profesjonalny ton.
 
-Upewnij się, że odpowiedź w formacie JSON bezpośrednio odzwierciedla funkcję do wywołania i uzupełnia wszelkie potrzebne komunikaty wyjaśniające w trakcie interakcji.
-"""
+def order_status_scenario(conversation_history: list[dict]):
+    chat = GetOrderStatusChat()
+    data = chat.answer(conversation_history)
+    print(data['output'])
+    return data['conversation_history']
 
 
 def chatbot():
     print("Witaj w restauracji Daniowo 🍽, jestem asystentem Pomidorówka 🧑‍🤝‍🧑. W czym mogę pomoć?")
+    last_scenario = None
+    conversation_history = []
     while True:
         user_input = input("Ty: ")
 
@@ -152,34 +191,41 @@ def chatbot():
             break
 
         print("Pomidorówka: ")
-
-        response = ollama.chat(
-            model="llama3.1",
-            stream=False,
-            messages=[
-                {"role": "system", "content": CHATBOT_SYSTEM_PROMPT},
-                {"role": "user", "content": user_input}
-            ],
-            format="json",
-        )
-        bot_output = json.loads(response['message']['content'])
-
-        function = bot_output['function']
+        function = get_scenario(user_input)
 
         if function == 'get_opening_hours':
-            get_opening_hours()
+            if last_scenario != 'get_opening_hours':
+                conversation_history = []
+            conversation_history.append({"role": "user", "content": user_input})
+            last_scenario = function
+            print(f"*****TEST: {conversation_history}")
+            conversation_history = opening_hours_scenario(conversation_history)
 
         elif function == 'get_menu':
-            print_menu()
+            if last_scenario != 'get_menu':
+                conversation_history = []
+            conversation_history.append({"role": "user", "content": user_input})
+            last_scenario = function
+            conversation_history = menu_scenario(conversation_history)
 
         elif function == 'place_order':
-            place_order()
+            if last_scenario != 'place_order':
+                conversation_history = []
+            conversation_history.append({"role": "user", "content": user_input})
+            last_scenario = function
+            conversation_history = order_scenario(conversation_history)
+
 
         elif function == 'get_order_status':
-            get_order_status()
+            if last_scenario != 'get_menu':
+                conversation_history = []
+            conversation_history.append({"role": "user", "content": user_input})
+            last_scenario = function
+            conversation_history = order_status_scenario(conversation_history)
 
         elif function == 'do_nothing':
-            do_nothing(user_input)
+            pass
+            # do_nothing(user_input)
 
     print()
 

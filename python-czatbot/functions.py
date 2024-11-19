@@ -1,3 +1,6 @@
+import json
+
+import ollama
 
 
 def get_opening_hours():
