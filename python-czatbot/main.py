@@ -30,12 +30,12 @@ class Chat:
                      ] + conversation_history,
             format="json"
         )
-        print(f"***TEST: {response['message']}***")
+        # print(f"***TEST: {response['message']}***")
         json_output = json.loads(response['message']['content'])
         return json_output
 
     def get_response(self, conversation_history: list[dict]) -> dict:
-        print(f"TEST***{conversation_history}")
+        # print(f"TEST***{conversation_history}")
         response = ollama.chat(
             model=self.config.model,
             stream=False,
@@ -44,7 +44,7 @@ class Chat:
                      ] + conversation_history,
         )
         output = response['message']['content']
-        print(f"***TEST: {response['message']}***")
+        # print(f"***TEST: {response['message']}***")
         return {
             "output": output,
             "conversation_history": conversation_history + [{"role": "assistant", "content": output}]
@@ -65,11 +65,20 @@ class OpeningHourChat:
             f"Jesteś pomocnym asystentem restauracji. Udzielasz informacji o godzinach otwarcia restauracji."
             f"Godziny otwarcia restauracji w formacie json: {get_opening_hours_str()}"
             f"Dzisiaj jest: {get_today()}. godzina: {get_time()}")
-        print(f"prompt: {self.system_prompt}")
+        # print(f"prompt: {self.system_prompt}")
         self.chat = Chat(self.system_prompt, Config())
 
     def answer(self, conversation_history: list[dict]):
         return self.chat.get_response(conversation_history)
+
+
+class CollectingChat:
+    def __init__(self):
+        self.system_prompt = "Jesteś pomocnym asystentem restauracji. Użytkownik jest w trakcie składania zamówienia. Na podstawie wiadomości od użytkownika, zwróć json {output: <boolean>}, czy już zamówienie zostało już skończone czy nie."
+        self.chat = Chat(self.system_prompt, Config())
+
+    def is_order_finished(self, conversation_history: list[dict]):
+        return self.chat.get_json_response(conversation_history)
 
 
 class PlaceOrderChat:
@@ -151,7 +160,7 @@ def get_scenario(user_prompt: str):
 
 def opening_hours_scenario(conversation_history: list[dict]):
     chat = OpeningHourChat()
-    print("*opening hours scenario*")
+    # print("*opening hours scenario*")
     data = chat.answer(conversation_history)
     print(data['output'])
     return data['conversation_history']
@@ -161,14 +170,32 @@ def menu_scenario(conversation_history: list[dict]):
     chat = GetMenuChat()
     data = chat.answer(conversation_history)
     print(data['output'])
-    print('*menu scenario*')
+    # print('*menu scenario*')
     return data['conversation_history']
 
 
 def order_scenario(conversation_history: list[dict]):
     chat = PlaceOrderChat()
     data = chat.answer(conversation_history)
-    print(data['output'])
+    is_finished = False
+    collecting_chat = CollectingChat()
+    ordering_chat_conversation_history = conversation_history
+    while not is_finished:
+        response_collecting = collecting_chat.is_order_finished(ordering_chat_conversation_history)
+        # print(f"response collecting: {response_collecting}")
+        is_finished = response_collecting['output']
+        # print(f"is finished: {is_finished}")
+        if is_finished:
+            break
+        response = chat.answer(ordering_chat_conversation_history)
+        # print(f"response: {response}")
+        ordering_chat_conversation_history = response['conversation_history']
+        print(response['output'])
+        user_input = input("Ty: ")
+        ordering_chat_conversation_history.append({"role": "user", "content": user_input})
+
+    final_response = chat.answer(conversation_history + [{"role": "system", "content": "Podsumowanie zamówienia: "}])
+    print(final_response['output'])
     return data['conversation_history']
 
 
