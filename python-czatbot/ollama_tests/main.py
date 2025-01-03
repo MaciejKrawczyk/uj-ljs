@@ -182,7 +182,7 @@ def order_scenario(conversation_history: list[dict]):
     ordering_chat_conversation_history = conversation_history
     while not is_finished:
         response_collecting = collecting_chat.is_order_finished(ordering_chat_conversation_history)
-        # print(f"response collecting: {response_collecting}")
+        print(f"response collecting: {response_collecting}")
         is_finished = response_collecting['output']
         # print(f"is finished: {is_finished}")
         if is_finished:
@@ -193,6 +193,7 @@ def order_scenario(conversation_history: list[dict]):
         print(response['output'])
         user_input = input("Ty: ")
         ordering_chat_conversation_history.append({"role": "user", "content": user_input})
+    print('finishing...')
 
     final_response = chat.answer(conversation_history + [{"role": "system", "content": "Podsumowanie zamówienia: "}])
     print(final_response['output'])
