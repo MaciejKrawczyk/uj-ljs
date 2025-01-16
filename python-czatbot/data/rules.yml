@@ -11,3 +11,8 @@ rules:
   steps:
   - intent: bot_challenge
   - action: utter_iamabot
+
+- rule: Respond to opening hours inquiry on a specific day
+  steps:
+    - intent: ask_opening_hours_on_day
+    - action: action_provide_opening_hours_on_day

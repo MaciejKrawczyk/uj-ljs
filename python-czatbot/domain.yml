@@ -40,6 +40,7 @@ actions:
   - action_list_menu
   - action_order_food
   - confirm_pick_up
+  - action_provide_opening_hours_on_day
 
 entities:
   - day

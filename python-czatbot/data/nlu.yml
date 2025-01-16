@@ -1,6 +1,15 @@
 version: "3.1"
 
 nlu:
+  - intent: ask_opening_hours_on_day
+    examples: |
+     - At what time are you open on [Monday](day)?
+     - What are your opening hours on [Tuesday](day)?
+     - When do you open on [Wednesday](day)?
+     - Are you open on [Thursday](day)?
+     - What time do you close on [Friday](day)?
+     - Tell me your hours on [Saturday](day).
+     - Do you operate on [Sunday](day)?
   - intent: opening_hours
     examples: |
       - Show me open hours
