@@ -12,6 +12,7 @@ intents:
   - place_an_order
   - opening_hours_on_particular_day
   - list_menu
+  - ask_opening_hours_on_day
 
 responses:
   utter_greet:
@@ -45,7 +46,6 @@ actions:
 entities:
   - day
   - hour
-  - time
   - food
   - amount
   - additional_request

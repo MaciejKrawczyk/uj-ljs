@@ -18,12 +18,12 @@ nlu:
 
   - intent: opening_hours_on_particular_day
     examples: |
-      - Is the restaurant open on [Monday](day) at [14](hour) [PM](time) 
+      - Is the restaurant open on [Monday](day) at [14](hour) 
       - Will the restaurant be open on [Tuesday](day) evening at [20](hour)
-      - Are you open this [Wednesday](day) at [1](hour) [PM](time)?
+      - Are you open this [Wednesday](day) at [1](hour)?
       - Does the restaurant open at [11:20](hour) on [Thursdays](day)?
-      - Will you be open on [Friday](day) night at [10](hour) [PM](time)?
-      - Is the restaurant open this [Saturday](day) at [12:15](hour) [PM](time)?
+      - Will you be open on [Friday](day) night at [10](hour)?
+      - Is the restaurant open this [Saturday](day) at [12:15](hour)?
       - Will you be serving customers on [Sunday](day) morning at [9:00](hour) ?
 
   - intent: list_menu
